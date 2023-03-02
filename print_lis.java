@@ -19,7 +19,7 @@ public class print_lis{
             //we are searching for, set the right boundary to mid
             if (nums[tail[mid]] >= goal)
                 right = mid;
-            //otherwise, set the left boundary equal to the midpoint
+                //otherwise, set the left boundary equal to the midpoint
             else
                 left = mid;
         }
@@ -50,8 +50,8 @@ public class print_lis{
             //smallest element
             if (nums[i] < nums[tail_index[0]])
                 tail_index[0] = i;
-            //if the current element is greater than the previous maximum, we attempt to add the element
-            // to the current longest increasing subsequence
+                //if the current element is greater than the previous maximum, we attempt to add the element
+                // to the current longest increasing subsequence
             else if (nums[i] > nums[tail_index[len - 1]]) {
                 prev_index[i] = tail_index[len - 1];
                 tail_index[len++] = i;
@@ -60,8 +60,9 @@ public class print_lis{
             // potential to be chosen as part of the longest increasing subsequence.
             //We have it replace the current ceiling value in tail index.
             //The ceiling value is the next value in the sequence that is larger than or equal to the current value.
-            //To find the ceiling value, we have to perform a binary search to find its index
-            //within the tail_index array
+            //To find the ceiling value, we perform a binary search to find its index within the tail_index array
+            //A binary search can be done because tail_index is always sorted and we must have O(nlogn) time complexity
+            //in order to avoid exceeding the time limit
             else {
                 int pos = get_ceil_index(nums, tail_index, -1, len - 1, nums[i]);
                 if(pos != 0){
