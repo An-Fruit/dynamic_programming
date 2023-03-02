@@ -58,8 +58,7 @@ public class knapsack{
         int val = K[total_items][capacity];
         Stack<Integer>  indexes = new Stack<>();
         weight_remaining = capacity;
-        curitem = total_items;
-        //goes in reverse to find the items that you "picked" in your knapsack.
+        //goes in reverse to find the items that you "picked" for your knapsack.
         for(curitem = total_items; curitem > 0 && val > 0; curitem--){
             //if you didn't choose an item, then skip
             if(val == K[curitem - 1][weight_remaining]){
@@ -69,6 +68,7 @@ public class knapsack{
             val -= vals[curitem - 1];
             weight_remaining -= weight[curitem - 1];
         }
+        //output the number of items and their indices
         System.out.println(indexes.size());
         while(!indexes.isEmpty()){
             System.out.print(indexes.pop() + " ");
@@ -77,8 +77,8 @@ public class knapsack{
     }
     public void run() throws Exception{
 
-        Scanner f = new Scanner(new File("knapsack.dat"));
-        //Scanner f = new Scanner(System.in);
+//        Scanner f = new Scanner(new File("knapsack.dat"));
+        Scanner f = new Scanner(System.in);
         while(f.hasNext()){
             int C = f.nextInt();
             int n = f.nextInt();

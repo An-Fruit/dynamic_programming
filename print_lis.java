@@ -10,151 +10,96 @@ import static java.lang.Math.*;
 import static java.util.Arrays.*;
 
 public class print_lis{
-    //helper binary search method
-    static int GetCeilIndex(int nums[], int tail[], int left, int right, int goal)
-    {
-
+    static int get_ceil_index(int[] nums, int[] tail, int left, int right, int goal) {
+        //ensures that right is > left
         while (right - left > 1) {
-
+            //find midpoint
             int mid = left + (right - left) / 2;
+            //if the number in the sequence pointed to by mid is greater than or equal to the target number that
+            //we are searching for, set the right boundary to mid
             if (nums[tail[mid]] >= goal)
                 right = mid;
+            //otherwise, set the left boundary equal to the midpoint
             else
                 left = mid;
         }
-
         return right;
     }
 
-
-    //optimal method using binary search and a series of "previous" indexes"
+    //optimal method using binary search and a series of "previous" indexes
     //https://stackoverflow.com/questions/2631726/how-to-determine-the-longest-increasing-subsequence-using-dynamic-programming
     //comprehensive python solution to look over
-    static int longest_increasing_subsequence(int nums[], int n)
+    public void longest_increasing_subsequence(int[] nums)
     {
-        int N = nums.length;
+        int n = nums.length;
+        //tail index will be used to find the ending point of the longest increasing subsequence.
+        //the value at the end of the tail index array will always be the INDEX OF the largest number in the
+        //sequence, and the value at the beginning will always be the INDEX OF the smallest number in the sequence
+        //tail indices will always be sorted because of the way the algorithm adds elements to it
+        int[] tail_index = new int[n];
+        Arrays.fill(tail_index, 0);
+        //prev index is used to keep track of our "active" longest increasing subsequence.
+        int[] prev_index = new int[n];
+        Arrays.fill(prev_index, -1);
 
-        // Add boundary case, when array n is zero
-        // Depend on smart pointers
-
-        int tailIndices[] = new int[n];
-
-        // Initialized with 0
-        Arrays.fill(tailIndices, 0);
-
-        int prevIndices[] = new int[n];
-
-        // initialized with -1
-        Arrays.fill(prevIndices, -1);
-
-        // it will always point to empty
-        // location
         int len = 1;
 
         for (int i = 1; i < n; i++) {
-            if (nums[i] < nums[tailIndices[0]])
-
-                // new smallest value
-                tailIndices[0] = i;
-
-            else if (nums[i] > nums[tailIndices[len - 1]]) {
-
-                // arr[i] wants to extend
-                // largest subsequence
-                prevIndices[i] = tailIndices[len - 1];
-                tailIndices[len++] = i;
+            //if the current element is smaller than the element pointed to by the beginning of
+            //tail index, change the beginning of tail index to point towards the index of the new
+            //smallest element
+            if (nums[i] < nums[tail_index[0]])
+                tail_index[0] = i;
+            //if the current element is greater than the previous maximum, we attempt to add the element
+            // to the current longest increasing subsequence
+            else if (nums[i] > nums[tail_index[len - 1]]) {
+                prev_index[i] = tail_index[len - 1];
+                tail_index[len++] = i;
             }
+            //if the element is neither a maximum or minimum, it still has
+            // potential to be chosen as part of the longest increasing subsequence.
+            //We have it replace the current ceiling value in tail index.
+            //The ceiling value is the next value in the sequence that is larger than or equal to the current value.
+            //To find the ceiling value, we have to perform a binary search to find its index
+            //within the tail_index array
             else {
-
-                // arr[i] wants to be a potential
-                // condidate of future subsequence
-                // It will replace ceil value in
-                // tailIndices
-                // perform a binary search from
-                int left = -1;
-                int right = len - 1;
-                //int pos = GetCeilIndex(nums, tailIndices, -1, len - 1, nums[i]);
-                while (right - left > 1) {
-                    int mid = left + (right - left) / 2;
-                    if (nums[tailIndices[mid]] >= nums[i])
-                        right = mid;
-                    else
-                        left = mid;
-                }
-                prevIndices[i] = tailIndices[right - 1];
-                tailIndices[right] = i;
-            }
-        }
-
-//        System.out.println("LIS of given input");
-
-        for (int i = tailIndices[len - 1]; i >= 0;
-             i = prevIndices[i])
-            System.out.print(nums[i] + " ");
-
-//        System.out.println();
-
-        return len;
-    }
-
-
-    //non-optimal method, still cannot pass runtime
-    public ArrayList<Integer> get_lis(int[] nums){
-        ArrayList<Integer>[] subsequences = new ArrayList[nums.length];
-        Arrays.fill(subsequences, new ArrayList<>());
-        subsequences[0].add(0);
-        for(int i = 1; i < nums.length; i++){
-            subsequences[i] = new ArrayList<>();
-            for(int j = 0; j < i; j++){
-                if(nums[j] < nums[i] && subsequences[j].size() + 1 > subsequences[i].size()){
-                    subsequences[i] = new ArrayList<Integer>();
-                    for(int tmp : subsequences[j]){
-                        subsequences[i].add(tmp);
-                    }
-//                 out.println(subsequences[i]);
+                int pos = get_ceil_index(nums, tail_index, -1, len - 1, nums[i]);
+                if(pos != 0){
+                    prev_index[i] = tail_index[pos - 1];
+                    tail_index[pos] = i;
                 }
             }
-            subsequences[i].add(i);
-            out.println(subsequences[i]);
         }
-
-
-        int max = Integer.MIN_VALUE;
-        ArrayList<Integer> temp = new ArrayList<Integer>();
-        for(ArrayList<Integer> subsequence : subsequences){
-            if(subsequence.size() > max){
-                max = subsequence.size();
-                temp = subsequence;
-            }
+        //output the size and indices of the longest increasing subsequence.
+        System.out.println(len);
+        Stack<Integer> s = new Stack<>();
+        for (int i = tail_index[len - 1]; i >= 0; i = prev_index[i])
+            s.push(i);
+        while(!s.isEmpty()){
+            out.print(s.pop() + " ");
         }
-        return temp;
+        System.out.println();
     }
-	public void run() throws Exception{
-	
-	    Scanner f = new Scanner(new File("print_lis.dat"));
-	    //Scanner f = new Scanner(System.in);
-        
+    public void run() throws Exception{
+
+//        Scanner f = new Scanner(new File("lis.dat"));
+        Scanner f = new Scanner(System.in);
+
         while(f.hasNext()){
             int N = f.nextInt();
             int[] nums = new int[N];
             for(int i = 0; i < N; i++){
                 nums[i] = f.nextInt();
             }
-            ArrayList<Integer> sub = get_lis(nums);
-            out.println(sub.size());
-            String s = "";
-            for(int i : sub){
-                s += i + " ";
-            }
-            out.println(s.trim());
+            longest_increasing_subsequence(nums);
         }
-        
+
         f.close();
-        
-	}
-	public static void main(String[] args) throws Exception{
-	
-	new print_lis().run();
-	
-	}
+
+    }
+    public static void main(String[] args) throws Exception{
+
+        new print_lis().run();
+
+    }
 }
